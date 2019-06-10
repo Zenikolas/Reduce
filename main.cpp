@@ -3,10 +3,9 @@
 #include <tuple>
 #include <sstream>
 
-#include "r.h"
+#include "reducedsum.h"
 
-bool isNumber(const char* pstr, const size_t maxLen = 0,const bool isSigned = true)
-{
+bool isNumber(const char *pstr, const size_t maxLen = 0, const bool isSigned = true) {
     if (!pstr || *pstr == '\0') {
         return false;
     }
@@ -23,7 +22,7 @@ bool isNumber(const char* pstr, const size_t maxLen = 0,const bool isSigned = tr
                 if (!isFirstChar) {
                     return false;
                 }
-            break;
+                break;
             default:
                 if (*pstr < '0' || *pstr > '9') {
                     return false;
@@ -42,7 +41,7 @@ bool isNumber(const char* pstr, const size_t maxLen = 0,const bool isSigned = tr
 }
 
 std::tuple<bool, size_t, long int, long int> parseArgs(int argc, char *argv[]) {
-    const char* usage = "Usage: <program_name> -nUNSIGNEDINT -aINT -bINT [-h]";
+    const char *usage = "Usage: <program_name> -nUNSIGNEDINT -aINT -bINT [-h]";
     const char *options = "n:a:b:h";
     const size_t maxIntDimension = std::numeric_limits<long int>::digits10;
     const size_t maxUIntDimension = std::numeric_limits<unsigned long int>::digits10;
@@ -52,7 +51,7 @@ std::tuple<bool, size_t, long int, long int> parseArgs(int argc, char *argv[]) {
     size_t n{};
     bool nPassed = false, aPassed = false, bPassed = false;
     std::string msg;
-    while ( (key = getopt(argc, argv, options)) != -1) {
+    while ((key = getopt(argc, argv, options)) != -1) {
         std::stringstream ss;
         if (optarg) {
             ss << optarg;
@@ -82,7 +81,7 @@ std::tuple<bool, size_t, long int, long int> parseArgs(int argc, char *argv[]) {
             case '?':
             default:
                 msg += "Argument parsing error! Option: ";
-                msg += (char)optopt;
+                msg += (char) optopt;
                 msg += "\n";
                 break;
         }
@@ -106,20 +105,20 @@ int main(int argc, char *argv[]) {
     printf("Received params n: %lu, a: %ld, b: %ld\n", n, a, b);
     printf("R arguments calculating ...");
 
-    calculating::RParams rParams(n, a, b);
+    scientific::ReducedSumParams rParams(n, a, b);
     rParams.init();
     printf(" done!\n");
 
     printf("R calculating ...");
     if (rParams.isSmallDimension()) {
-        auto r = calculating::r(rParams.getSmallDimensionNParam(), rParams
-                .getSmallDimensionMParam());
+        auto r = scientific::backwardReducedSum(rParams.getSmallDimensionNParam(),
+                                       rParams.getSmallDimensionMParam());
 
         printf(" done!\n");
         printf("R: %ld", r);
     } else {
-//        auto r = calculating::r(rParams.getBigDimensionNParam(), rParams
-//                .getBigDimensionMParam());
+//        auto r = scientific::backwardReducedSum(rParams.getBigDimensionNParam(),
+//                                       rParams.getBigDimensionMParam());
         printf(" done!\n");
 //        printf("R: %s", r.c_str());
     }
