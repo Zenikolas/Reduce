@@ -16,6 +16,8 @@ public:
     StringNumber& operator=(const StringNumber&) = default;
     StringNumber& operator=(StringNumber&&) = default;
 
+    void push_back(char c) { m_number.push_back(c); }
+
     bool isNull() const;
     size_t size() const { return m_number.size(); }
     auto begin() const { return m_number.begin(); }
