@@ -5,28 +5,14 @@
 namespace scientific {
     namespace {
         bool isLessModule(const StringNumber &lhs, const StringNumber &rhs) {
-            size_t lsize = lhs.size();
-            size_t rsize = rhs.size();
-            auto lit = lhs.cbegin();
-            auto rit = rhs.cbegin();
-
-            if (lhs.isSigned()) {
-                --lsize;
-                ++lit;
-            }
-
-            if (rhs.isSigned()) {
-                --rsize;
-                ++rit;
-            }
-
-            if (lsize < rsize) {
+            if (lhs.size() < rhs.size()) {
                 return true;
-            } else if (rsize < lsize) {
+            } else if (rhs.size() < lhs.size()) {
                 return false;
             }
 
-            for (; lit != lhs.cend(); ++lit, ++rit) {
+            auto rit = rhs.begin();
+            for (auto lit = lhs.cbegin(); lit != lhs.cend(); ++lit, ++rit) {
                 if (*lit < *rit) {
                     return true;
                 } else if (*rit < *lit) {
@@ -49,27 +35,13 @@ namespace scientific {
                 shortEnd = lhs.crend();
                 longBegin = rhs.crbegin();
                 longBeginAppend = longBegin + lhs.size();
-                if (lhs.isSigned()) {
-                    --shortEnd;
-                    --longBeginAppend;
-                }
                 longEnd = rhs.crend();
-                if (rhs.isSigned()) {
-                    --longEnd;
-                }
             } else {
                 shortBegin = rhs.crbegin();
                 shortEnd = rhs.crend();
                 longBegin = lhs.crbegin();
                 longBeginAppend = longBegin + rhs.size();
-                if (rhs.isSigned()) {
-                    --shortEnd;
-                    --longBeginAppend;
-                }
                 longEnd = lhs.crend();
-                if (lhs.isSigned()) {
-                    --longEnd;
-                }
             }
         }
     }
@@ -86,25 +58,32 @@ namespace scientific {
         return isNull;
     }
 
-    void StringNumber::initNumber(const std::string &number) {
-        if (number.front() == '+') {
-            m_isSigned = true;
-        } else if (number.front() == '-') {
-            m_isPositive = false;
-            m_isSigned = true;
+    void StringNumber::push_back(char c) {
+        if (c >= '0' && c <= '9') {
+            m_number.push_back(c);
         }
     }
 
-    void StringNumber::normalize()
-    {
-        m_number.erase(std::find_if(m_number.rbegin(), m_number.rend(),
-                               [](char ch) {
-                                   return ch != '0';
-                               }).base(), m_number.end());
-
-        if (m_number.empty()) {
-            m_number.push_back('0');
+    void StringNumber::initNumber(const std::string &number) {
+        auto begin = number.cbegin();
+        if (number.front() == '+') {
+            m_isPositive = true;
+            ++begin;
+        } else if (number.front() == '-') {
+            m_isPositive = false;
+            ++begin;
         }
+
+        begin = std::find_if(begin, number.cend(), [](char ch) { return ch != '0'; });
+
+        m_number.assign(begin, number.cend());
+    }
+
+    void StringNumber::normalize() {
+        m_number.erase(std::find_if(m_number.rbegin(), m_number.rend(),
+                                    [](char ch) {
+                                        return ch != '0';
+                                    }).base(), m_number.end());
     }
 
     StringNumber operator+(const StringNumber &lhs, const StringNumber &rhs) {
@@ -197,7 +176,7 @@ namespace scientific {
         }
 
         if (negative || (!lhs.isPositive() && !rhs.isPositive())) {
-            result.push_back('-');
+            result.setPositive(false);
         }
 
         result.normalize();
@@ -223,8 +202,42 @@ namespace scientific {
         return StringNumber{};
     }
 
+    bool operator<(const StringNumber &lhs, const StringNumber &rhs) {
+        bool inverse = false;
+        if (!lhs.isPositive()) {
+            if (rhs.isPositive()) {
+                return true;
+            } else {
+                inverse = true;
+            }
+        } else {
+            if (!rhs.isPositive()) {
+                return false;
+            }
+        }
+
+        bool isLess = isLessModule(lhs, rhs);
+        if (inverse && isLess) {
+            return false;
+        }
+
+        return isLess;
+    }
+
+    bool operator==(const StringNumber &lhs, const StringNumber &rhs) {
+        return !((lhs < rhs) || (rhs < lhs));
+    }
+
     std::ostream &operator<<(std::ostream &os, const
     StringNumber &number) {
+        if (!number.isPositive()) {
+            os << "-";
+        }
+
+        if (number.isNull()) {
+            os << "0";
+        }
+
         for (auto &sym : number) {
             os << sym;
         }

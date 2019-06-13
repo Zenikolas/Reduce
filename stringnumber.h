@@ -7,7 +7,6 @@ namespace scientific {
     class StringNumber {
         std::string m_number;
         bool m_isPositive = true;
-        bool m_isSigned = false;
 
         void initNumber(const std::string &number);
 
@@ -16,12 +15,12 @@ namespace scientific {
         using value_type = std::string::value_type;
 
         // CREATORS
-        StringNumber() : m_number(0) {}
-        explicit StringNumber(const std::string &number) : m_number(number) {
-            initNumber(m_number);
+        StringNumber() = default;
+        explicit StringNumber(const std::string &number) {
+            initNumber(number);
         }
-        explicit StringNumber(const char *number) : m_number(number) {
-            initNumber(m_number);
+        explicit StringNumber(const char *number) {
+            initNumber(number);
         }
 
         StringNumber(const StringNumber &) = default;
@@ -29,12 +28,12 @@ namespace scientific {
         StringNumber &operator=(const StringNumber &) = default;
         StringNumber &operator=(StringNumber &&) = default;
 
-        void push_back(char c) { m_number.push_back(c); }
+        void push_back(char c);
         void normalize();
+        void setPositive(bool isPositive) { m_isPositive = isPositive; }
 
         bool isNull() const;
         bool isPositive() const { return m_isPositive; }
-        bool isSigned() const { return m_isSigned; }
 
         size_t size() const { return m_number.size(); }
 
@@ -52,6 +51,9 @@ namespace scientific {
     StringNumber operator+(const StringNumber &lhs, const StringNumber &rhs);
 
     StringNumber operator*(const StringNumber &lhs, const StringNumber &rhs);
+
+    bool operator<(const StringNumber& lhs, const StringNumber& rhs);
+    bool operator==(const StringNumber& lhs, const StringNumber& rhs);
 
     std::ostream& operator<<(std::ostream& os, const StringNumber& number);
 }
