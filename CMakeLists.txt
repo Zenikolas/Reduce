@@ -5,5 +5,9 @@ set(CMAKE_CXX_STANDARD 17)
 
 set(CMAKE_CXX_FLAGS  "-stdlib=libc++ -std=c++1z")
 
-set(SOURCES reducedsum.cpp stringnumber.cpp)
-add_executable(ReducedSum main.cpp ${SOURCES})
+set(SOURCES reducedsum.cpp stringnumber.cpp main.cpp)
+add_executable(ReducedSum ${SOURCES})
+
+enable_testing()
+
+add_subdirectory(test)

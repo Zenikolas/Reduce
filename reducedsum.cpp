@@ -1,4 +1,4 @@
-#include "ReducedSum.h"
+#include "reducedsum.h"
 
 namespace scientific {
 namespace {
