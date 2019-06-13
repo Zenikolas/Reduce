@@ -1,9 +1,12 @@
 find_package(GTest REQUIRED)
 
-include_directories(${GTest_INCLUDE_DIRS})
+include_directories(${GTEST_INCLUDE_DIRS})
 
 add_executable(stringNumberTest stringnumbertest.cpp)
 
-target_link_libraries(stringNumberTest ${GTest_LIBRARIES} pthread)
+message("Found gtest libs: ${GTEST_LIBRARIES}")
+message("Found gtest libs: ${GTEST_BOTH_LIBRARIES}")
+message("Found gtest libs: ${GTEST_FOUND}")
+target_link_libraries(stringNumberTest ${GTEST_BOTH_LIBRARIES} pthread)
 
 gtest_discover_tests(stringNumberTest)
