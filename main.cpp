@@ -4,6 +4,7 @@
 #include <sstream>
 
 #include "reducedsum.h"
+#include "stringnumber.h"
 
 bool isNumber(const char *pstr, const size_t maxLen = 0, const bool isSigned = true) {
     if (!pstr || *pstr == '\0') {
@@ -112,7 +113,7 @@ int main(int argc, char *argv[]) {
     printf("R calculating ...");
     if (rParams.isSmallDimension()) {
         auto r = scientific::backwardReducedSum(rParams.getSmallDimensionNParam(),
-                                       rParams.getSmallDimensionMParam());
+                                                rParams.getSmallDimensionMParam());
 
         printf(" done!\n");
         printf("R: %ld", r);
@@ -122,5 +123,4 @@ int main(int argc, char *argv[]) {
         printf(" done!\n");
 //        printf("R: %s", r.c_str());
     }
-
 }

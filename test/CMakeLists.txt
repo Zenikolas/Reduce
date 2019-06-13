@@ -1,6 +1,6 @@
 find_package(GTest REQUIRED)
 
-include_directories(${PROJECT_SOURCE_DIR} ${GTest_INCLUDE_DIRS})
+include_directories(${GTest_INCLUDE_DIRS})
 
 add_executable(stringNumberTest stringnumbertest.cpp)
 
