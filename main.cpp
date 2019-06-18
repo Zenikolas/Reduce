@@ -2,9 +2,9 @@
 #include <unistd.h>
 #include <tuple>
 #include <sstream>
+#include <limits>
 
 #include "reducedsum.h"
-#include "stringnumber.h"
 
 bool isNumber(const char *pstr, const size_t maxLen = 0, const bool isSigned = true) {
     if (!pstr || *pstr == '\0') {
@@ -98,7 +98,11 @@ std::tuple<bool, size_t, long int, long int> parseArgs(int argc, char *argv[]) {
 }
 
 int main(int argc, char *argv[]) {
-    auto[ret, n, a, b] = parseArgs(argc, argv);
+
+    bool ret = true;
+    size_t n{};
+    long int a{}, b{};
+    std::tie(ret, n, a, b) = parseArgs(argc, argv);
     if (!ret) {
         return 0;
     }
@@ -107,20 +111,18 @@ int main(int argc, char *argv[]) {
     printf("R arguments calculating ...");
 
     scientific::ReducedSumParams rParams(n, a, b);
-    rParams.init();
+    if (!rParams.init()) {
+        printf("To big params! Exiting..");
+        return 0;
+    }
     printf(" done!\n");
 
     printf("R calculating ...");
-    if (rParams.isSmallDimension()) {
-        auto r = scientific::backwardReducedSum(rParams.getSmallDimensionNParam(),
-                                                rParams.getSmallDimensionMParam());
+    auto r = scientific::backwardReducedSum(rParams.getNParam(),
+                                            rParams.getMParam());
 
-        printf(" done!\n");
-        printf("R: %ld", r);
-    } else {
-//        auto r = scientific::backwardReducedSum(rParams.getBigDimensionNParam(),
-//                                       rParams.getBigDimensionMParam());
-        printf(" done!\n");
-//        printf("R: %s", r.c_str());
-    }
+    printf(" done!\n");
+    printf("R: %ld", r);
+
+    return 0;
 }

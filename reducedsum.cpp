@@ -1,4 +1,8 @@
 #include "reducedsum.h"
+#include <limits>
+#include <vector>
+#include <algorithm>
+#include <numeric>
 
 namespace scientific {
 namespace {
@@ -18,7 +22,7 @@ size_t getDimension10(Type number)
 }
 }
 
-bool ReducedSumParams::isSmallDimension(size_t n, long int a, long int b)
+bool ReducedSumParams::checkDimensionParams(size_t n, long int a, long int b)
 {
     const size_t nDimension = getDimension10(n);
     const size_t aDimension = getDimension10(a);
@@ -34,26 +38,34 @@ bool ReducedSumParams::isSmallDimension(size_t n, long int a, long int b)
     return true;
 }
 
-void ReducedSumParams::initSmallParams()
+bool ReducedSumParams::init()
 {
+    if (!checkDimensionParams(m_n, m_a, m_b)) {
+        return false;
+    }
+
     for (size_t i = 0; i < m_n; ++i) {
-        m_smallMParam.emplace_front(m_a * (m_n - i));
-        m_smallNParam.emplace_front(m_b * (m_n - i - m_a));
+        m_mParam.emplace_front(m_a * (m_n - i));
+        m_nParam.emplace_front(m_b * (m_n - i - m_a));
     }
+
+    return true;
 }
 
-void ReducedSumParams::initBigParams()
+long int backwardReducedSum(const std::forward_list<long int>& lhs, const std::forward_list<long int>& rhs)
 {
-
-}
-
-void ReducedSumParams::init()
-{
-    if (m_small) {
-        initSmallParams();
-    } else {
-        initBigParams();
+    if (rhs.empty()) {
+        return 0;
     }
+
+    std::forward_list<long int> tmp;
+    for (auto& elem : rhs) {
+        tmp.emplace_front(elem);
+    }
+
+    std::vector<long int> output;
+    std::transform(lhs.begin(), lhs.end(), tmp.begin(), std::back_inserter(output), std::multiplies<>());
+    return std::accumulate(output.begin(), output.end(), 0L);
 }
 
 }
